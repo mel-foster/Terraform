@@ -1,22 +1,40 @@
-#Simplified main.tf
+#Configure the AWS Provider
+provider "aws" {
+  region = "us-east-1"
+}
 
-resource "aws_instance" "ubuntu" {
-  ami                    = var.instance_ami
-  instance_type          = var.instance_type
+#Create EC2 instance 
+resource "aws_instance" "instance1" {
+  ami                    = "ami-053b0d53c279acc90"
+  instance_type          = "t2.micro"
   vpc_security_group_ids = [aws_security_group.wk20sg_jenkins.id]
   tags = {
     Name = "wk20jenkins_instance"
   }
 
-  #User Data in AWS EC2
-  user_data = file("script.sh")
+  #Bootstrap Jenkins 
+  user_data = <<-EOF
+  #!/bin/bash
+  sudo apt update
+  sudo apt install openjdk-11-jre
+  curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+    /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+  echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] \
+    https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+    /etc/apt/sources.list.d/jenkins.list > /dev/null
+  sudo apt-get update -y
+  sudo apt-get install jenkins
+  sudo systemctl enablejenkins
+  sudo systemtl start jenkins
+  EOF
+
+  user_data_replace_on_change = true
 }
 
 #Create security group 
 resource "aws_security_group" "wk20sg_jenkins" {
   name        = "wk20sg_jenkins"
   description = "Open ports 22, 8080, and 443"
-  vpc_id      = var.vpc_id
 
   #Allow incoming TCP requests on port 22 from any IP
   ingress {
@@ -58,7 +76,7 @@ resource "aws_security_group" "wk20sg_jenkins" {
   }
 }
 
-#Create S3 bucket for Jenkins artifacts; PRIVATE BY DEFAULT
+#Create S3 bucket for Jenkins artifacts
 resource "aws_s3_bucket" "wk20jenkins-artifacts" {
   bucket = "wk20jenkins-artifacts-${random_id.randomness.hex}"
 
