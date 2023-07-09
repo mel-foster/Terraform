@@ -28,6 +28,18 @@ resource "aws_s3_bucket_public_access_block" "s3bucket-week21-melfoster-accessbl
   restrict_public_buckets = true
 }
 
+# Defining subnets from my default vpc
+data "aws_subnets" "selected_subnets" {
+  filter {
+    name   = "vpc-id"
+    values = [var.vpc_id]
+  }
+  filter {
+    name   = "subnet-id"
+    values = [var.subnet_id_1, var.subnet_id_2]
+  }
+}
+
 # Create Launch Template Resource Block
 resource "aws_launch_template" "asg_ec2_template" {
   name                   = var.environment
@@ -44,7 +56,7 @@ resource "aws_launch_template" "asg_ec2_template" {
 # Create ASG Resource Block
 resource "aws_autoscaling_group" "wk21asg" {
   name               = var.environment
-  availability_zones = var.availability_zones
+  vpc_zone_identifier = data.aws_subnets.selected_subnets.ids
   desired_capacity   = 2
   max_size           = 5
   min_size           = 2
