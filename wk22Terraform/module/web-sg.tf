@@ -2,7 +2,7 @@
 
 #Create a security group that allows traffic from the internet 
 resource "aws_security_group" "web-tier-sg" {
-  name   = "terraform-sg-web"
+  name   = "wk22-sg-web"
   vpc_id = aws_vpc.wk22-vpc.id
 
   ingress {
@@ -10,7 +10,7 @@ resource "aws_security_group" "web-tier-sg" {
     from_port   = var.SSH
     to_port     = var.SSH
     protocol    = var.tcp
-    cidr_blocks = [var.cidr]
+    cidr_blocks = [var.web-cidr]
   }
 
   ingress {
@@ -18,7 +18,7 @@ resource "aws_security_group" "web-tier-sg" {
     from_port   = var.HTTP
     to_port     = var.HTTP
     protocol    = var.tcp
-    cidr_blocks = [var.cidr]
+    cidr_blocks = [var.web-cidr]
   }
 
   egress {
@@ -26,7 +26,7 @@ resource "aws_security_group" "web-tier-sg" {
     from_port   = var.egress-all
     to_port     = var.egress-all
     protocol    = var.egress
-    cidr_blocks = [var.cidr]
+    cidr_blocks = [var.web-cidr]
   }
 
   lifecycle {
