@@ -55,11 +55,11 @@ resource "aws_launch_template" "asg_ec2_template" {
 
 # Create ASG Resource Block
 resource "aws_autoscaling_group" "wk21asg" {
-  name               = var.environment
+  name                = var.environment
   vpc_zone_identifier = data.aws_subnets.selected_subnets.ids
-  desired_capacity   = 2
-  max_size           = 5
-  min_size           = 2
+  desired_capacity    = 2
+  max_size            = 5
+  min_size            = 2
   tag {
     key                 = "Name"
     value               = "wk21EC2_Foster"
