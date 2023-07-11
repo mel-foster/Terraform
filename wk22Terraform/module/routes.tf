@@ -1,4 +1,4 @@
-#wk22 Route Tables
+#Wk 22 Route Tables
 
 #Create route table for public subnets
 resource "aws_route_table" "public-rtb" {
@@ -10,7 +10,7 @@ resource "aws_route_table" "public-rtb" {
   }
 
   tags = {
-    Name = "wk22_public_rtb"
+    Name = "terraform_public_rtb"
     Tier = "public"
   }
 }
@@ -24,23 +24,25 @@ resource "aws_route_table" "private-rtb" {
     nat_gateway_id = aws_nat_gateway.nat-gateway.id
   }
   tags = {
-    Name = "wk22-private-rtb"
+    Name = "terraform-private-rtb"
     Tier = "private"
   }
 }
 
+#Route Table Associations
 #Create public route table associations
 resource "aws_route_table_association" "public" {
   depends_on     = [aws_subnet.public-subnets]
-  route_table_id = aws_route_table.wk22_public_rtb.id
+  route_table_id = aws_route_table.public-rtb.id
   for_each       = aws_subnet.public-subnets
   subnet_id      = each.value.id
 }
 
 #Create private route table associations
 resource "aws_route_table_association" "private" {
-  depends_on     = [aws_subnet.private-subnets-tf]
-  route_table_id = aws_route_table.wk22-private-rtb.id
+  depends_on     = [aws_subnet.private-subnets]
+  route_table_id = aws_route_table.private-rtb.id
   for_each       = aws_subnet.private-subnets
   subnet_id      = each.value.id
 }
+

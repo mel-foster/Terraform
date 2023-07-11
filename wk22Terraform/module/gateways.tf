@@ -1,5 +1,3 @@
-#Wk22 Internetgateway
-
 #Create Internet Gateway
 resource "aws_internet_gateway" "internet-gateway" {
   vpc_id = aws_vpc.wk22-vpc.id
@@ -10,7 +8,7 @@ resource "aws_internet_gateway" "internet-gateway" {
 
 #Create EIP for NAT Gateway
 resource "aws_eip" "nat-gateway-eip" {
-  vpc        = true
+  vpc        = aws_vpc.wk22-vpc.id
   depends_on = [aws_internet_gateway.internet-gateway]
   tags = {
     Name = "wk22-nat-gw-eip"
