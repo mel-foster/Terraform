@@ -5,6 +5,7 @@ terraform {
 
     workspaces {
       name = "Wk22-MelFoster"
+
     }
   }
 }
